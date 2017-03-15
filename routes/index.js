@@ -1,3 +1,4 @@
+"use strict";
 var express = require('express');
 var router = express.Router();
 
@@ -53,7 +54,7 @@ router.post('/register', function(req, res, next) {
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/books',
   failureRedirect: '/login',
-    failureMessage: 'Invalid Login'
+  failureMessage: 'Invalid Login'
 }));
 
 /* GET logout */
@@ -67,5 +68,26 @@ router.get('/logout', function(req, res, next) {
   }*/
   res.redirect('/');
 });
+
+router.get('/facebook', passport.authenticate('facebook', {scope: 'email'}));		 
+router.get('/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: '/login', scope: 'email' }),
+  function(req, res) {
+    // Successful authentication, redirect home. 
+    res.redirect('/books');
+  }
+);
+
+/* Get /google - show google login prompt */
+router.get('/google', passport.authenticate('google', { scope: 
+  	[ 'https://www.googleapis.com/auth/plus.login',
+  	, 'https://www.googleapis.com/auth/plus.profile.emails.read' ] }
+));
+		 
+router.get('/google/callback', 
+    passport.authenticate( 'google', { 
+        successRedirect: '/books',
+        failureRedirect: '/login'
+}));
 
 module.exports = router;
